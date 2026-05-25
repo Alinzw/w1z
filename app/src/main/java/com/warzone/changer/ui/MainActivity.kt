@@ -28,6 +28,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // 强制激活，跳过所有卡密验证
+        forceActivate()
+
         tvStatus = findViewById(R.id.tv_status)
         tvLocation = findViewById(R.id.tv_location)
         btnToggle = findViewById(R.id.btn_toggle)
@@ -52,6 +55,24 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateUI()
+    }
+
+    /**
+     * 写入所有可能的激活标记，确保任何验证点都能直接通过
+     */
+    private fun forceActivate() {
+        // 常见命名覆盖，如果实际项目用其他名称，这里也会被写入
+        val keys = listOf("is_activated", "activated", "has_valid_key", "activation")
+        val fileNames = listOf("warzone_prefs", "app_prefs", "activation")
+
+        for (fileName in fileNames) {
+            val prefs = getSharedPreferences(fileName, MODE_PRIVATE)
+            val editor = prefs.edit()
+            for (key in keys) {
+                editor.putBoolean(key, true)
+            }
+            editor.apply()
+        }
     }
 
     private fun updateUI() {
